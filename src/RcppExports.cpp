@@ -7,13 +7,13 @@
 using namespace Rcpp;
 
 // calcNormS
-arma::mat calcNormS(const List& D, int ncols);
+arma::mat calcNormS(const List& D, int& ncols);
 RcppExport SEXP _hogsvdR_calcNormS(SEXP DSEXP, SEXP ncolsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const List& >::type D(DSEXP);
-    Rcpp::traits::input_parameter< int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< int& >::type ncols(ncolsSEXP);
     rcpp_result_gen = Rcpp::wrap(calcNormS(D, ncols));
     return rcpp_result_gen;
 END_RCPP

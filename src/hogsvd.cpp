@@ -1,6 +1,9 @@
 #include <RcppArmadillo.h>
 #include <vector>
 
+#include <omp.h>
+// [[Rcpp::plugins(openmp)]]
+
 using namespace Rcpp;
 
 // [[Rcpp::depends(RcppArmadillo)]]
@@ -10,22 +13,19 @@ using namespace Rcpp;
 //' @param ncols number of columns of input matrices
 //' @export
 // [[Rcpp::export]]
-arma::mat calcNormS(const List& D, int ncols) {
+arma::mat calcNormS(const List& D, int& ncols) {
   arma::uword N = D.size();
-  
   std::vector<arma::mat> A(N);
   std::vector<arma::mat> Ainv(N);
+  arma::mat S(ncols, ncols, arma::fill::zeros);
 
   #pragma omp parallel for
   for ( arma::uword i = 0; i < N; i++) {
-    arma::mat Di = as<arma::mat>(D[i]);
- 
+    arma::mat Di = as<arma::mat>(D[i]); 
     arma::mat matA = Di.t() * Di;
     A[i] = matA;
     Ainv[i] = arma::inv(matA);
   }
-  
-  arma::mat S(ncols, ncols, arma::fill::zeros);
 
   #pragma omp parallel for
   for ( arma::uword i = 0; i < N; i++ ) {
@@ -35,8 +35,7 @@ arma::mat calcNormS(const List& D, int ncols) {
       S = S + tmp;
     }
   }
-  
-  
+    
   S = S / (N * (N - 1));
   
   return S;

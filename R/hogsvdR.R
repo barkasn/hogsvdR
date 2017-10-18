@@ -86,6 +86,7 @@ hogsvd.rsimple <- function(D) {
 #' Calculate the normalised S matrix
 #' @param D a list of matrices
 calcNormS.R <- function(D) {
+  N <- length(D)
   Ddim <- dim(D[[1]])
     
   # Calculate A matrices and their inverses

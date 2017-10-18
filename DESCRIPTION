@@ -5,7 +5,7 @@ Title: HO GSVD for R
 Authors@R: c(person("Nikolas", "Barkas", role = c("aut","cre"),
                      email = "Nikolaos_Barkas@hms.harvard.edu"))
 Depends: R (>= 3.1.0)
-Imports: MASS
+Imports: MASS, Rcpp
 Description: Implementation of higher order GSVD in R. Based on Ponnapalli, Sri Priya, et al. "A higher-order generalized singular value decomposition for comparison of global mRNA expression from multiple organisms." PloS one 6.12 (2011): e28072.
 License: GPL (>= 2)
 URL: https://github.com/barkasn/hogsvdR

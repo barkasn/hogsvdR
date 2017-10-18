@@ -115,8 +115,7 @@ calcNormS.R <- function(D) {
 #' @return A list of U, Sigma, V,  Lambda and S. U and Sigma are lists of matrices
 #' @importFrom  MASS ginv
 hogsvd.rArmadillo <- function(D) {
-#  require(MASS)
-  
+
   # Generate named sequence along data
   N <- length(D)
   Nseq <- 1:N
@@ -129,28 +128,28 @@ hogsvd.rArmadillo <- function(D) {
 
   # Eigen decomposition of S matrix
   eigen.dec <- eigen(S, symmetric = F)
-  
+
   # The Lambda
   Lambda <- eigen.dec$values
   
   V <- eigen.dec$vectors
   Vinv <- MASS::ginv(eigen.dec$vectors)
-  
+
   # Compute matrices B
   B <- lapply(D, function(x) {
     t( Vinv %*% t(x)  )
   })
-  
+
   # Compute diagonal matrices Sigma
   Sigma <- lapply(Nseq, function(i) {
     apply(B[[i]],2,function(x) sqrt(sum(x^2)))
   })
-  
+
   # Calculate U, the column normalised version of B
   U <- lapply(Nseq, function(i) {
     sweep(B[[i]],2,Sigma[[i]],FUN='/')
   })
-  
+
   # Return
   list( U = U, Sigma = Sigma, V = V, Lambda = Lambda, S = S)
 }

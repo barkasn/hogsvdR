@@ -15,7 +15,8 @@ arma::mat calcNormS(const List& D, int ncols) {
   
   std::vector<arma::mat> A(N);
   std::vector<arma::mat> Ainv(N);
-  
+
+  #pragma omp parallel for  
   for (int i = 0; i < N; i++) {
     arma::mat Di = as<arma::mat>(D[i]);
  
@@ -26,6 +27,7 @@ arma::mat calcNormS(const List& D, int ncols) {
   
   arma::mat S(ncols, ncols, arma::fill::zeros);
   
+  #pragma omp parallel for
   for ( arma::uword i = 0; i < N; i++ ) {
     for ( arma::uword j = i + 1; j < N; j++) {
       arma::mat Ai = A[i];

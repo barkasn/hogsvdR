@@ -4,12 +4,12 @@
 \alias{hogsvd}
 \title{Compute the HO GSVD decomposition of a list of matrices}
 \usage{
-hogsvd(D, method = "rsimple")
+hogsvd(D, method = "arma")
 }
 \arguments{
 \item{D}{a list of matrices to compute the GSVD decomposition on}
 
-\item{method}{specification of internal function to use to compute HOGSVD, currently only 'rsimple' supported}
+\item{method}{specification of internal function to use to compute HOGSVD, 'arma' or 'rsimple'}
 }
 \value{
 A list of U, Sigma and V. U and Sigma are lists of matrices

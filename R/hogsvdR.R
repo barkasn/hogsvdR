@@ -1,6 +1,12 @@
+#' @useDynLib hogsvdR
+#' @importFrom Rcpp sourceCpp
+NULL
+
+## NULL
+
 #' Compute the HO GSVD decomposition of a list of matrices
 #' @param D a list of matrices to compute the GSVD decomposition on
-#' @param method specification of internal function to use to compute HOGSVD, currently only 'rsimple' supported
+#' @param method specification of internal function to use to compute HOGSVD, 'arma' or 'rsimple'
 #' @return A list of U, Sigma and V. U and Sigma are lists of matrices
 #' @examples 
 #' N <- 3
@@ -26,6 +32,10 @@ hogsvd <- function(D, method = 'rsimple') {
   
   if (method == 'rsimple') {
     res <- hogsvd.rsimple(D);
+  } else if (method == 'arma') {
+    res <- hogsvd.rArmadillo(D);
+  } else {
+      stop('Unknown method parameter');
   }
   
   list(U = res$U, Sigma = res$Sigma, V = res$V);
@@ -37,15 +47,47 @@ hogsvd <- function(D, method = 'rsimple') {
 #' @return A list of U, Sigma, V,  Lambda and S. U and Sigma are lists of matrices
 #' @importFrom  MASS ginv
 hogsvd.rsimple <- function(D) {
-#  require(MASS)
-  
   # Generate named sequence along data
   N <- length(D)
   Nseq <- 1:N
   names(Nseq) <- Nseq
+
+  # Calculate normalised S
+  S <- calcNormS.R(D);
+    
+  # Eigen decomposition of S matrix
+  eigen.dec <- eigen(S, symmetric = F)
   
+  # The Lambda
+  Lambda <- eigen.dec$values
+  
+  V <- eigen.dec$vectors
+  Vinv <- MASS::ginv(eigen.dec$vectors)
+  
+  # Compute matrices B
+  B <- lapply(D, function(x) {
+    t( Vinv %*% t(x)  )
+  })
+  
+  # Compute diagonal matrices Sigma
+  Sigma <- lapply(Nseq, function(i) {
+    apply(B[[i]],2,function(x) sqrt(sum(x^2)))
+  })
+  
+  # Calculate U, the column normalised version of B
+  U <- lapply(Nseq, function(i) {
+    sweep(B[[i]],2,Sigma[[i]],FUN='/')
+  })
+  
+  # Return
+  list( U = U, Sigma = Sigma, V = V, Lambda = Lambda, S = S)
+}
+
+#' Calculate the normalised S matrix
+#' @param D a list of matrices
+calcNormS.R <- function(D) {
   Ddim <- dim(D[[1]])
-  
+    
   # Calculate A matrices and their inverses
   A <- lapply(D, function(x) {t(x) %*% x})
   Ainv <- lapply(A, function(x) {MASS::ginv(x)})
@@ -64,7 +106,27 @@ hogsvd.rsimple <- function(D) {
   
   # Normalise S
   S <- S / (N * (N - 1))
+
+  S
+}
+
+#' Compute the HO GSVD decomposition of a list of matrices using c acceleration
+#' @param D a list of matrices to compute the GSVD decomposition on
+#' @return A list of U, Sigma, V,  Lambda and S. U and Sigma are lists of matrices
+#' @importFrom  MASS ginv
+hogsvd.rArmadillo <- function(D) {
+#  require(MASS)
   
+  # Generate named sequence along data
+  N <- length(D)
+  Nseq <- 1:N
+  names(Nseq) <- Nseq
+  
+  Ddim <- dim(D[[1]])
+
+  # Calculate S in C++
+  S <- calcNormS(D, Ddim[2]);
+
   # Eigen decomposition of S matrix
   eigen.dec <- eigen(S, symmetric = F)
   

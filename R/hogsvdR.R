@@ -72,17 +72,6 @@ hogsvd <- function(D, method = 'arma') {
 #' @param D a list of matrices to compute the GSVD decomposition on
 #' @return A list of U, Sigma, V,  Lambda and S. U and Sigma are lists of matrices
 #' @importFrom  MASS ginv
-#' @examples 
-#' N <- 3
-#' nrow <- c(10,10,10)
-#' ncol <- 10
-#' s <- 1:N
-#' D <- lapply(s, function(x) {matrix(rnorm(n=nrow[x]*ncol,mean = 0, sd =10),nrow[x],ncol)})
-#' 
-#' # Perform HO GSVD on the example
-#' res <- hogsvd.rsimple(D)
-#' str(res)
-#' 
 hogsvd.rsimple <- function(D) {
   # Generate named sequence along data
   N <- length(D)
@@ -122,15 +111,6 @@ hogsvd.rsimple <- function(D) {
 
 #' Calculate the normalised S matrix in R, for internal use
 #' @param D a list of matrices
-#' @examples 
-#' N <- 3
-#' nrow <- c(10,10,10)
-#' ncol <- 10
-#' s <- 1:N
-#' D <- lapply(s, function(x) {matrix(rnorm(n=nrow[x]*ncol,mean = 0, sd =10),nrow[x],ncol)})
-#' 
-#' # Perform HO GSVD on the example
-#' res <- calcNormS.R(D)
 calcNormS.R <- function(D) {
   N <- length(D)
   Ddim <- dim(D[[1]])
@@ -161,15 +141,6 @@ calcNormS.R <- function(D) {
 #' @param D a list of matrices to compute the GSVD decomposition on
 #' @return A list of U, Sigma, V,  Lambda and S. U and Sigma are lists of matrices
 #' @importFrom  MASS ginv
-#' @examples 
-#' N <- 3
-#' nrow <- c(10,10,10)
-#' ncol <- 10
-#' s <- 1:N
-#' D <- lapply(s, function(x) {matrix(rnorm(n=nrow[x]*ncol,mean = 0, sd =10),nrow[x],ncol)})
-#' 
-#' # Perform HO GSVD on the example
-#' res <- hogsvd.rArmadillo(D)
 hogsvd.rArmadillo <- function(D) {
 
   # Generate named sequence along data

@@ -15,15 +15,3 @@ A list of U, Sigma, V,  Lambda and S. U and Sigma are lists of matrices
 \description{
 Compute the Higher-order generalised singular value decomposition (HOGSVD) of a list of matrices without Armadillo
 }
-\examples{
-N <- 3
-nrow <- c(10,10,10)
-ncol <- 10
-s <- 1:N
-D <- lapply(s, function(x) {matrix(rnorm(n=nrow[x]*ncol,mean = 0, sd =10),nrow[x],ncol)})
-
-# Perform HO GSVD on the example
-res <- hogsvd.rsimple(D)
-str(res)
-
-}

@@ -7,7 +7,7 @@ Authors@R: c(person("Nikolas", "Barkas", role = c("aut","cre"),
 Author: Nikolas Barkas [aut, cre]
 Depends: R (>= 3.1.0)
 Imports: MASS, Rcpp
-Description: Implementation of higher order generalized singular value decomposition (HO GSVD) in R. Based on Ponnapalli, Saunders, etal (2011) <doi:doi.org/10.1371/journal.pone.0028072>
+Description: Implementation of higher order generalized singular value decomposition (HO GSVD) in R. Based on Ponnapalli, Saunders, etal (2011) <doi:10.1371/journal.pone.0028072>.
 License: GPL (>= 2)
 URL: https://github.com/barkasn/hogsvdR
 BugReports: https://github.com/barkasn/hogsvdR/issues

@@ -18,7 +18,7 @@ NULL
 #' 
 #' D.reconstruct <- lapply(1:N, function(n) { res$U[[n]] %*% diag(res$Sigma[[n]]) %*% t(res$V) })
 #' @export hogsvd
-hogsvd <- function(D, method = 'rsimple') {
+hogsvd <- function(D, method = 'arma') {
   # Check all D are matrices
   if(!all(unlist(lapply(D, class)) == "matrix")) {
     stop('All elements of D have to be of class matrix'); 

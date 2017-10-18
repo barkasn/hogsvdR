@@ -2,7 +2,7 @@
 % Please edit documentation in R/hogsvdR.R
 \name{hogsvd.rArmadillo}
 \alias{hogsvd.rArmadillo}
-\title{Compute the HO GSVD decomposition of a list of matrices using c acceleration}
+\title{Compute the Higher-order generalised singular value decomposition (HOGSVD) of a list of matrices with RcppArmadillo}
 \usage{
 hogsvd.rArmadillo(D)
 }
@@ -13,5 +13,15 @@ hogsvd.rArmadillo(D)
 A list of U, Sigma, V,  Lambda and S. U and Sigma are lists of matrices
 }
 \description{
-Compute the HO GSVD decomposition of a list of matrices using c acceleration
+Compute the Higher-order generalised singular value decomposition (HOGSVD) of a list of matrices with RcppArmadillo
+}
+\examples{
+N <- 3
+nrow <- c(10,10,10)
+ncol <- 10
+s <- 1:N
+D <- lapply(s, function(x) {matrix(rnorm(n=nrow[x]*ncol,mean = 0, sd =10),nrow[x],ncol)})
+
+# Perform HO GSVD on the example
+res <- hogsvd.rArmadillo(D)
 }

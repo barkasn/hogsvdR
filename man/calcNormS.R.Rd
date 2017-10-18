@@ -2,7 +2,7 @@
 % Please edit documentation in R/hogsvdR.R
 \name{calcNormS.R}
 \alias{calcNormS.R}
-\title{Calculate the normalised S matrix}
+\title{Calculate the normalised S matrix in R, for internal use}
 \usage{
 calcNormS.R(D)
 }
@@ -10,5 +10,15 @@ calcNormS.R(D)
 \item{D}{a list of matrices}
 }
 \description{
-Calculate the normalised S matrix
+Calculate the normalised S matrix in R, for internal use
+}
+\examples{
+N <- 3
+nrow <- c(10,10,10)
+ncol <- 10
+s <- 1:N
+D <- lapply(s, function(x) {matrix(rnorm(n=nrow[x]*ncol,mean = 0, sd =10),nrow[x],ncol)})
+
+# Perform HO GSVD on the example
+res <- calcNormS.R(D)
 }

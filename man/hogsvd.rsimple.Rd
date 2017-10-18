@@ -2,7 +2,7 @@
 % Please edit documentation in R/hogsvdR.R
 \name{hogsvd.rsimple}
 \alias{hogsvd.rsimple}
-\title{Compute the HO GSVD decomposition of a list of matrices}
+\title{Compute the Higher-order generalised singular value decomposition (HOGSVD) of a list of matrices without Armadillo}
 \usage{
 hogsvd.rsimple(D)
 }
@@ -13,5 +13,17 @@ hogsvd.rsimple(D)
 A list of U, Sigma, V,  Lambda and S. U and Sigma are lists of matrices
 }
 \description{
-Compute the HO GSVD decomposition of a list of matrices
+Compute the Higher-order generalised singular value decomposition (HOGSVD) of a list of matrices without Armadillo
+}
+\examples{
+N <- 3
+nrow <- c(10,10,10)
+ncol <- 10
+s <- 1:N
+D <- lapply(s, function(x) {matrix(rnorm(n=nrow[x]*ncol,mean = 0, sd =10),nrow[x],ncol)})
+
+# Perform HO GSVD on the example
+res <- hogsvd.rsimple(D)
+str(res)
+
 }

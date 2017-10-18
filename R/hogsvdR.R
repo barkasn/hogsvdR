@@ -4,19 +4,46 @@ NULL
 
 ## NULL
 
-#' Compute the HO GSVD decomposition of a list of matrices
+#' Compute the Higher-order generalised singular value decomposition (HOGSVD)  of a list of matrices
 #' @param D a list of matrices to compute the GSVD decomposition on
 #' @param method specification of internal function to use to compute HOGSVD, 'arma' or 'rsimple'
 #' @return A list of U, Sigma and V. U and Sigma are lists of matrices
 #' @examples 
+#' # Generate 3 matrices to run example on
 #' N <- 3
 #' nrow <- c(10,10,10)
 #' ncol <- 10
 #' s <- 1:N
 #' D <- lapply(s, function(x) {matrix(rnorm(n=nrow[x]*ncol,mean = 0, sd =10),nrow[x],ncol)})
+#' 
+#' # Perform HO GSVD on the example
 #' res <- hogsvd(D)
 #' 
+#' # Inspect result
+#' str(res)
+#' 
+#' # The first U matrix corresponding to D[[1]]
+#' res$U[[1]]
+#' 
+#' # The first S diagonal matrix correspoinding to D[[1]]
+#' res$S[[1]]
+#' 
+#' # The shared V matrix
+#' res$V
+#' 
+#' # Reconstruct the original matrices
 #' D.reconstruct <- lapply(1:N, function(n) { res$U[[n]] %*% diag(res$Sigma[[n]]) %*% t(res$V) })
+#' 
+#' \dontshow{
+#' # Should return TRUE to confirm all arrays could be reconstructed correctly
+#' all(unlist(lapply(1:N, function(n) { max(D[[n]] - res$U[[n]] %*% diag(res$Sigma[[n]]) %*% t(res$V)) })) < 1.e-10)
+#' }
+#' 
+#' \donttest{
+#' # Perform decomposition without RcppArmadillo acceleration
+#' res.slow <- hogsvd(D, method = 'rsimple')
+#' }
+#' 
 #' @export hogsvd
 hogsvd <- function(D, method = 'arma') {
   # Check all D are matrices
@@ -41,11 +68,21 @@ hogsvd <- function(D, method = 'arma') {
   list(U = res$U, Sigma = res$Sigma, V = res$V);
 }
 
-
-#' Compute the HO GSVD decomposition of a list of matrices
+#' Compute the Higher-order generalised singular value decomposition (HOGSVD) of a list of matrices without Armadillo
 #' @param D a list of matrices to compute the GSVD decomposition on
 #' @return A list of U, Sigma, V,  Lambda and S. U and Sigma are lists of matrices
 #' @importFrom  MASS ginv
+#' @examples 
+#' N <- 3
+#' nrow <- c(10,10,10)
+#' ncol <- 10
+#' s <- 1:N
+#' D <- lapply(s, function(x) {matrix(rnorm(n=nrow[x]*ncol,mean = 0, sd =10),nrow[x],ncol)})
+#' 
+#' # Perform HO GSVD on the example
+#' res <- hogsvd.rsimple(D)
+#' str(res)
+#' 
 hogsvd.rsimple <- function(D) {
   # Generate named sequence along data
   N <- length(D)
@@ -83,8 +120,17 @@ hogsvd.rsimple <- function(D) {
   list( U = U, Sigma = Sigma, V = V, Lambda = Lambda, S = S)
 }
 
-#' Calculate the normalised S matrix
+#' Calculate the normalised S matrix in R, for internal use
 #' @param D a list of matrices
+#' @examples 
+#' N <- 3
+#' nrow <- c(10,10,10)
+#' ncol <- 10
+#' s <- 1:N
+#' D <- lapply(s, function(x) {matrix(rnorm(n=nrow[x]*ncol,mean = 0, sd =10),nrow[x],ncol)})
+#' 
+#' # Perform HO GSVD on the example
+#' res <- calcNormS.R(D)
 calcNormS.R <- function(D) {
   N <- length(D)
   Ddim <- dim(D[[1]])
@@ -111,10 +157,19 @@ calcNormS.R <- function(D) {
   S
 }
 
-#' Compute the HO GSVD decomposition of a list of matrices using c acceleration
+#' Compute the Higher-order generalised singular value decomposition (HOGSVD) of a list of matrices with RcppArmadillo
 #' @param D a list of matrices to compute the GSVD decomposition on
 #' @return A list of U, Sigma, V,  Lambda and S. U and Sigma are lists of matrices
 #' @importFrom  MASS ginv
+#' @examples 
+#' N <- 3
+#' nrow <- c(10,10,10)
+#' ncol <- 10
+#' s <- 1:N
+#' D <- lapply(s, function(x) {matrix(rnorm(n=nrow[x]*ncol,mean = 0, sd =10),nrow[x],ncol)})
+#' 
+#' # Perform HO GSVD on the example
+#' res <- hogsvd.rArmadillo(D)
 hogsvd.rArmadillo <- function(D) {
 
   # Generate named sequence along data

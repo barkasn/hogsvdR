@@ -11,13 +11,13 @@ using namespace Rcpp;
 //' @export
 // [[Rcpp::export]]
 arma::mat calcNormS(const List& D, int ncols) {
-  int N = D.size();
+  arma::uword N = D.size();
   
   std::vector<arma::mat> A(N);
   std::vector<arma::mat> Ainv(N);
 
   #pragma omp parallel for
-  for (int i = 0; i < N; i++) {
+  for ( arma::uword i = 0; i < N; i++) {
     arma::mat Di = as<arma::mat>(D[i]);
  
     arma::mat matA = Di.t() * Di;

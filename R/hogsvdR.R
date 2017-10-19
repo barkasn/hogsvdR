@@ -46,6 +46,11 @@ NULL
 #' 
 #' @export hogsvd
 hogsvd <- function(D, method = 'arma') {
+  # Check that D is a list
+  if (class(D) != 'list') {
+    stop('D is not a list of matrices');
+  }
+  
   # Check all D are matrices
   if(!all(unlist(lapply(D, class)) == "matrix")) {
     stop('All elements of D have to be of class matrix'); 

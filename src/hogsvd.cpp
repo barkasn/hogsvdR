@@ -43,6 +43,10 @@ arma::mat calcNormS(const List& D, int& ncols, int nthreads = 1) {
       }
     }
   }
+  
+  // Force thread sync
+  #pragma omp barrier  
+    
     
   S = S / (N * (N - 1));
   

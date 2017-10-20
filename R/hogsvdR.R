@@ -9,6 +9,7 @@ NULL
 #' @param method specification of internal function to use to compute HOGSVD, 'arma' or 'rsimple'
 #' @param parallel use the parallel version or not
 #' @param nthreads number of threads / cores to use
+#' @param verbose logical verbosity
 #' @return A list of U, Sigma and V. U and Sigma are lists of matrices
 #' @examples 
 #' # Generate 3 matrices to run example on
@@ -58,7 +59,7 @@ NULL
 #' }
 #' 
 #' @export hogsvd
-hogsvd <- function(D, method = 'arma', parallel = T, nthreads = 2) {
+hogsvd <- function(D, method = 'arma', parallel = T, nthreads = 2, verbose = F) {
   # Check that D is a list
   if (class(D) != 'list') {
     stop('D is not a list of matrices');
@@ -76,9 +77,9 @@ hogsvd <- function(D, method = 'arma', parallel = T, nthreads = 2) {
   } 
   
   if (method == 'rsimple') {
-    res <- hogsvd.rsimple(D, parallel = parallel, nthreads = nthreads);
+    res <- hogsvd.rsimple(D, parallel = parallel, nthreads = nthreads, verbose = verbose);
   } else if (method == 'arma') {
-    res <- hogsvd.rArmadillo(D, parallel = parallel, nthreads = nthreads);
+    res <- hogsvd.rArmadillo(D, parallel = parallel, nthreads = nthreads, verbose = verbose);
   } else {
       stop('Unknown method parameter');
   }
@@ -91,17 +92,21 @@ hogsvd <- function(D, method = 'arma', parallel = T, nthreads = 2) {
 #' @param parallel logical use parallel version or not
 #' @return A list of U, Sigma, V,  Lambda and S. U and Sigma are lists of matrices
 #' @importFrom  MASS ginv
-hogsvd.rsimple <- function(D, parallel, nthreads) {
+hogsvd.rsimple <- function(D, parallel, nthreads, verbose) {
   # Generate named sequence along data
   N <- length(D)
   Nseq <- 1:N
   names(Nseq) <- Nseq
 
+  if (verbose) cat('Calculating normalised S...');
   # Calculate normalised S
   S <- calcNormS.R(D);
+  if (verbose) cat('done\n');
     
   # Eigen decomposition of S matrix
+  if (verbose) cat('Decomposing S matrix...');
   eigen.dec <- eigen(S, symmetric = F)
+  if (verbose) cat('done\n');
   
   # The Lambda
   Lambda <- eigen.dec$values
@@ -118,6 +123,7 @@ hogsvd.rsimple <- function(D, parallel, nthreads) {
     applyFn <- lapply;
   }
   
+  if (verbose) cat('Calculating B, Sigma and U matrices...');
   # Compute matrices B
   B <- applyFn(D, function(x) {
     t( Vinv %*% t(x)  )
@@ -132,6 +138,7 @@ hogsvd.rsimple <- function(D, parallel, nthreads) {
   U <- applyFn(Nseq, function(i) {
     sweep(B[[i]],2,Sigma[[i]],FUN='/')
   })
+  if (verbose) cat('done\n');
 
   # Return
   list( U = U, Sigma = Sigma, V = V, Lambda = Lambda, S = S)
@@ -169,7 +176,7 @@ calcNormS.R <- function(D) {
 #' @param D a list of matrices to compute the GSVD decomposition on
 #' @return A list of U, Sigma, V,  Lambda and S. U and Sigma are lists of matrices
 #' @importFrom  MASS ginv
-hogsvd.rArmadillo <- function(D, parallel = T, nthreads) {
+hogsvd.rArmadillo <- function(D, parallel = T, nthreads, verbose) {
   
   if (parallel) {
     require('parallel');
@@ -189,10 +196,14 @@ hogsvd.rArmadillo <- function(D, parallel = T, nthreads) {
   Ddim <- dim(D[[1]])
 
   # Calculate S in C++
+  if (verbose) cat('Calculating normalised S...');
   S <- calcNormS(D, Ddim[2], nthreads);
+  if (verbose) cat('done\n');
 
   # Eigen decomposition of S matrix
+  if (verbose) cat('Decomposing S matrix...');
   eigen.dec <- eigen(S, symmetric = F)
+  if (verbose) cat('done\n');
 
   # The Lambda
   Lambda <- eigen.dec$values
@@ -201,6 +212,7 @@ hogsvd.rArmadillo <- function(D, parallel = T, nthreads) {
   Vinv <- MASS::ginv(eigen.dec$vectors)
 
   # Compute matrices B
+  if (verbose) cat('Calculating B, Sigma and U matrices...');
   B <- applyFn(D, function(x) {
     t( Vinv %*% t(x)  )
   })
@@ -214,6 +226,7 @@ hogsvd.rArmadillo <- function(D, parallel = T, nthreads) {
   U <- applyFn(Nseq, function(i) {
     sweep(B[[i]],2,Sigma[[i]],FUN='/')
   })
+  if (verbose) cat('done\n');
 
   # Return
   list( U = U, Sigma = Sigma, V = V, Lambda = Lambda, S = S)

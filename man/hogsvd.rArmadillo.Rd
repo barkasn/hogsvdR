@@ -4,7 +4,7 @@
 \alias{hogsvd.rArmadillo}
 \title{Compute the Higher-order generalised singular value decomposition (HOGSVD) of a list of matrices with RcppArmadillo}
 \usage{
-hogsvd.rArmadillo(D, parallel = T, nthreads)
+hogsvd.rArmadillo(D, parallel = T, nthreads, verbose)
 }
 \arguments{
 \item{D}{a list of matrices to compute the GSVD decomposition on}

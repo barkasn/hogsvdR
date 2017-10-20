@@ -41,16 +41,27 @@ res$S[[1]]
 res$V
 
 # Reconstruct the original matrices
-D.reconstruct <- lapply(1:N, function(n) { res$U[[n]] \%*\% diag(res$Sigma[[n]]) \%*\% t(res$V) })
+D.reconstruct <- lapply(1:N, function(n) { 
+   res$U[[n]] \%*\% diag(res$Sigma[[n]]) \%*\% t(res$V) 
+})
+
+# Now repeat with the slow algorithm
+res.slow <- hogsvd(D, method = 'rsimple')
+D.reconstruct.slow <- lapply(1:N, function(n) { 
+  res.slow$U[[n]] \%*\% diag(res.slow$Sigma[[n]]) \%*\% t(res.slow$V) 
+})
 
 \dontshow{
 # Should return TRUE to confirm all arrays could be reconstructed correctly
-all(unlist(lapply(1:N, function(n) { max(D[[n]] - res$U[[n]] \%*\% diag(res$Sigma[[n]]) \%*\% t(res$V)) })) < 1.e-10)
-}
+all(unlist(lapply(1:N, function(n) { 
+  max(D[[n]] - res$U[[n]] \%*\% diag(res$Sigma[[n]]) \%*\% t(res$V)) 
+})) < 1.e-10)
 
-\donttest{
-# Perform decomposition without RcppArmadillo acceleration
-res.slow <- hogsvd(D, method = 'rsimple')
+# Check correct reconstruction with the slow method
+all(unlist(lapply(1:N, function(n) { 
+  max(D[[n]] - res.slow$U[[n]] \%*\% diag(res.slow$Sigma[[n]]) \%*\% t(res.slow$V)) 
+})) < 1.e-10)
+
 }
 
 }

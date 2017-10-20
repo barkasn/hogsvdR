@@ -4,12 +4,16 @@
 \alias{hogsvd}
 \title{Compute the Higher-order generalised singular value decomposition (HOGSVD)  of a list of matrices}
 \usage{
-hogsvd(D, method = "arma")
+hogsvd(D, method = "arma", parallel = T, nthreads = 2)
 }
 \arguments{
 \item{D}{a list of matrices to compute the GSVD decomposition on}
 
 \item{method}{specification of internal function to use to compute HOGSVD, 'arma' or 'rsimple'}
+
+\item{parallel}{use the parallel version or not}
+
+\item{nthreads}{number of threads / cores to use}
 }
 \value{
 A list of U, Sigma and V. U and Sigma are lists of matrices

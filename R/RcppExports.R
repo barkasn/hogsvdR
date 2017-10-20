@@ -4,8 +4,9 @@
 #' Calculate normalised S matrix
 #' @param D list of data matrices
 #' @param ncols number of columns of input matrices
+#' @param nthreads number of omp threads, 0 for max
 #' @export
-calcNormS <- function(D, ncols) {
-    .Call('_hogsvdR_calcNormS', PACKAGE = 'hogsvdR', D, ncols)
+calcNormS <- function(D, ncols, nthreads = 1L) {
+    .Call('_hogsvdR_calcNormS', PACKAGE = 'hogsvdR', D, ncols, nthreads)
 }
 

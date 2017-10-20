@@ -7,20 +7,21 @@
 using namespace Rcpp;
 
 // calcNormS
-arma::mat calcNormS(const List& D, int& ncols);
-RcppExport SEXP _hogsvdR_calcNormS(SEXP DSEXP, SEXP ncolsSEXP) {
+arma::mat calcNormS(const List& D, int& ncols, int nthreads);
+RcppExport SEXP _hogsvdR_calcNormS(SEXP DSEXP, SEXP ncolsSEXP, SEXP nthreadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const List& >::type D(DSEXP);
     Rcpp::traits::input_parameter< int& >::type ncols(ncolsSEXP);
-    rcpp_result_gen = Rcpp::wrap(calcNormS(D, ncols));
+    Rcpp::traits::input_parameter< int >::type nthreads(nthreadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(calcNormS(D, ncols, nthreads));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_hogsvdR_calcNormS", (DL_FUNC) &_hogsvdR_calcNormS, 2},
+    {"_hogsvdR_calcNormS", (DL_FUNC) &_hogsvdR_calcNormS, 3},
     {NULL, NULL, 0}
 };
 

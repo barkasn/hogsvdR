@@ -4,10 +4,12 @@
 \alias{hogsvd.rsimple}
 \title{Compute the Higher-order generalised singular value decomposition (HOGSVD) of a list of matrices without Armadillo}
 \usage{
-hogsvd.rsimple(D)
+hogsvd.rsimple(D, parallel, nthreads)
 }
 \arguments{
 \item{D}{a list of matrices to compute the GSVD decomposition on}
+
+\item{parallel}{logical use parallel version or not}
 }
 \value{
 A list of U, Sigma, V,  Lambda and S. U and Sigma are lists of matrices

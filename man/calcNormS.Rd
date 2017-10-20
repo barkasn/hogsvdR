@@ -4,12 +4,14 @@
 \alias{calcNormS}
 \title{Calculate normalised S matrix}
 \usage{
-calcNormS(D, ncols)
+calcNormS(D, ncols, nthreads = 1L)
 }
 \arguments{
 \item{D}{list of data matrices}
 
 \item{ncols}{number of columns of input matrices}
+
+\item{nthreads}{number of omp threads, 0 for max}
 }
 \description{
 Calculate normalised S matrix

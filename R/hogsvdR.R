@@ -7,6 +7,8 @@ NULL
 #' Compute the Higher-order generalised singular value decomposition (HOGSVD)  of a list of matrices
 #' @param D a list of matrices to compute the GSVD decomposition on
 #' @param method specification of internal function to use to compute HOGSVD, 'arma' or 'rsimple'
+#' @param parallel use the parallel version or not
+#' @param nthreads number of threads / cores to use
 #' @return A list of U, Sigma and V. U and Sigma are lists of matrices
 #' @examples 
 #' # Generate 3 matrices to run example on
@@ -56,7 +58,7 @@ NULL
 #' }
 #' 
 #' @export hogsvd
-hogsvd <- function(D, method = 'arma') {
+hogsvd <- function(D, method = 'arma', parallel = T, nthreads = 2) {
   # Check that D is a list
   if (class(D) != 'list') {
     stop('D is not a list of matrices');
@@ -74,9 +76,9 @@ hogsvd <- function(D, method = 'arma') {
   } 
   
   if (method == 'rsimple') {
-    res <- hogsvd.rsimple(D);
+    res <- hogsvd.rsimple(D, parallel = parallel, nthreads = nthreads);
   } else if (method == 'arma') {
-    res <- hogsvd.rArmadillo(D);
+    res <- hogsvd.rArmadillo(D, parallel = parallel, nthreads = nthreads);
   } else {
       stop('Unknown method parameter');
   }
@@ -86,9 +88,10 @@ hogsvd <- function(D, method = 'arma') {
 
 #' Compute the Higher-order generalised singular value decomposition (HOGSVD) of a list of matrices without Armadillo
 #' @param D a list of matrices to compute the GSVD decomposition on
+#' @param parallel logical use parallel version or not
 #' @return A list of U, Sigma, V,  Lambda and S. U and Sigma are lists of matrices
 #' @importFrom  MASS ginv
-hogsvd.rsimple <- function(D) {
+hogsvd.rsimple <- function(D, parallel, nthreads) {
   # Generate named sequence along data
   N <- length(D)
   Nseq <- 1:N
@@ -106,21 +109,30 @@ hogsvd.rsimple <- function(D) {
   V <- eigen.dec$vectors
   Vinv <- MASS::ginv(eigen.dec$vectors)
   
+  if (parallel) {
+    require('parallel');
+    applyFn <- mclapply;
+    # TODO: Restore these to original when done
+    options("mc.cores"=nthreads)
+  } else {
+    applyFn <- lapply;
+  }
+  
   # Compute matrices B
-  B <- lapply(D, function(x) {
+  B <- applyFn(D, function(x) {
     t( Vinv %*% t(x)  )
   })
-  
+
   # Compute diagonal matrices Sigma
-  Sigma <- lapply(Nseq, function(i) {
+  Sigma <- applyFn(Nseq, function(i) {
     apply(B[[i]],2,function(x) sqrt(sum(x^2)))
   })
   
   # Calculate U, the column normalised version of B
-  U <- lapply(Nseq, function(i) {
+  U <- applyFn(Nseq, function(i) {
     sweep(B[[i]],2,Sigma[[i]],FUN='/')
   })
-  
+
   # Return
   list( U = U, Sigma = Sigma, V = V, Lambda = Lambda, S = S)
 }
@@ -157,7 +169,17 @@ calcNormS.R <- function(D) {
 #' @param D a list of matrices to compute the GSVD decomposition on
 #' @return A list of U, Sigma, V,  Lambda and S. U and Sigma are lists of matrices
 #' @importFrom  MASS ginv
-hogsvd.rArmadillo <- function(D) {
+hogsvd.rArmadillo <- function(D, parallel = T, nthreads) {
+  
+  if (parallel) {
+    require('parallel');
+    applyFn <- mclapply;
+    # TODO: Restore these to original when done
+    options("mc.cores"=nthreads)
+  } else {
+    applyFn <- lapply;
+    nthreads <- 1; # For RcppArmadillo
+  }
 
   # Generate named sequence along data
   N <- length(D)
@@ -167,7 +189,7 @@ hogsvd.rArmadillo <- function(D) {
   Ddim <- dim(D[[1]])
 
   # Calculate S in C++
-  S <- calcNormS(D, Ddim[2]);
+  S <- calcNormS(D, Ddim[2], nthreads);
 
   # Eigen decomposition of S matrix
   eigen.dec <- eigen(S, symmetric = F)
@@ -179,17 +201,17 @@ hogsvd.rArmadillo <- function(D) {
   Vinv <- MASS::ginv(eigen.dec$vectors)
 
   # Compute matrices B
-  B <- lapply(D, function(x) {
+  B <- applyFn(D, function(x) {
     t( Vinv %*% t(x)  )
   })
-
+  
   # Compute diagonal matrices Sigma
-  Sigma <- lapply(Nseq, function(i) {
+  Sigma <- applyFn(Nseq, function(i) {
     apply(B[[i]],2,function(x) sqrt(sum(x^2)))
   })
-
+  
   # Calculate U, the column normalised version of B
-  U <- lapply(Nseq, function(i) {
+  U <- applyFn(Nseq, function(i) {
     sweep(B[[i]],2,Sigma[[i]],FUN='/')
   })
 

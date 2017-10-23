@@ -1,5 +1,5 @@
 Package: hogsvdR
-Version: 0.1
+Version: 0.1.1
 Date: 2017-10-17
 Title: Higher-Order Generalized Singular Value Decomposition
 Authors@R: c(person("Nikolas", "Barkas", role = c("aut","cre"),

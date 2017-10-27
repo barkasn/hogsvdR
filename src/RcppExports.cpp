@@ -7,21 +7,22 @@
 using namespace Rcpp;
 
 // calcNormS
-arma::mat calcNormS(const List& D, int& ncols, int nthreads);
-RcppExport SEXP _hogsvdR_calcNormS(SEXP DSEXP, SEXP ncolsSEXP, SEXP nthreadsSEXP) {
+arma::mat calcNormS(const List& D, int& ncols, int nthreads, bool verbose);
+RcppExport SEXP _hogsvdR_calcNormS(SEXP DSEXP, SEXP ncolsSEXP, SEXP nthreadsSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const List& >::type D(DSEXP);
     Rcpp::traits::input_parameter< int& >::type ncols(ncolsSEXP);
     Rcpp::traits::input_parameter< int >::type nthreads(nthreadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(calcNormS(D, ncols, nthreads));
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(calcNormS(D, ncols, nthreads, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_hogsvdR_calcNormS", (DL_FUNC) &_hogsvdR_calcNormS, 3},
+    {"_hogsvdR_calcNormS", (DL_FUNC) &_hogsvdR_calcNormS, 4},
     {NULL, NULL, 0}
 };
 

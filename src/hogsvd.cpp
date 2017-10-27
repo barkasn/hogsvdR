@@ -17,7 +17,7 @@ using namespace Rcpp;
 //' @param nthreads number of omp threads, 0 for max
 //' @export
 // [[Rcpp::export]]
-arma::mat calcNormS(const List& D, int& ncols, int nthreads = 1) {
+arma::mat calcNormS(const List& D, int& ncols, int nthreads = 0, bool verbose = true) {
   arma::uword N = D.size();
   std::vector<arma::mat> A(N);
   std::vector<arma::mat> Ainv(N);
@@ -29,6 +29,9 @@ arma::mat calcNormS(const List& D, int& ncols, int nthreads = 1) {
   }
   
   omp_set_num_threads(nthreads);
+  
+  if (verbose)
+    Rcpp::Rcout << " using " << nthreads << " openMP treads..." << std::endl;
 #endif
   
 #pragma omp parallel for
@@ -38,6 +41,18 @@ arma::mat calcNormS(const List& D, int& ncols, int nthreads = 1) {
     A[i] = matA;
     Ainv[i] = arma::inv(matA);
   }
+  
+  if (verbose)
+    Rcpp::Rcout << " A and Ainv computation complete " << std::endl;
+  
+  // Force thread sync
+  {
+    #pragma omp barrier  
+  }
+  
+  // Check for user interupt
+  Rcpp::checkUserInterrupt();
+  
   
 #pragma omp parallel for
   for ( arma::uword i = 0; i < N; i++ ) {
@@ -51,8 +66,12 @@ arma::mat calcNormS(const List& D, int& ncols, int nthreads = 1) {
   }
   
   // Force thread sync
-#pragma omp barrier  
+  {
+    #pragma omp barrier  
+  }
   
+  // Check for user interupt
+  Rcpp::checkUserInterrupt();
   
   S = S / (N * (N - 1));
   

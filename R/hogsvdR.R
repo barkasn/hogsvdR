@@ -176,7 +176,7 @@ calcNormS.R <- function(D) {
 #' @param D a list of matrices to compute the GSVD decomposition on
 #' @return A list of U, Sigma, V,  Lambda and S. U and Sigma are lists of matrices
 #' @importFrom  MASS ginv
-hogsvd.rArmadillo <- function(D, parallel = T, nthreads, verbose) {
+hogsvd.rArmadillo <- function(D, parallel = T, nthreads, verbose = FALSE) {
   
   if (parallel) {
     require('parallel');
@@ -197,7 +197,7 @@ hogsvd.rArmadillo <- function(D, parallel = T, nthreads, verbose) {
 
   # Calculate S in C++
   if (verbose) cat('Calculating normalised S...');
-  S <- calcNormS(D, Ddim[2], nthreads);
+  S <- calcNormS(D, Ddim[2], nthreads, verbose);
   if (verbose) cat('done\n');
 
   # Eigen decomposition of S matrix

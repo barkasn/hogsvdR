@@ -6,7 +6,7 @@
 #' @param ncols number of columns of input matrices
 #' @param nthreads number of omp threads, 0 for max
 #' @export
-calcNormS <- function(D, ncols, nthreads = 1L) {
-    .Call('_hogsvdR_calcNormS', PACKAGE = 'hogsvdR', D, ncols, nthreads)
+calcNormS <- function(D, ncols, nthreads = 0L, verbose = TRUE) {
+    .Call('_hogsvdR_calcNormS', PACKAGE = 'hogsvdR', D, ncols, nthreads, verbose)
 }
 

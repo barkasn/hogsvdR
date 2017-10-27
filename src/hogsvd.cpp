@@ -31,7 +31,7 @@ arma::mat calcNormS(const List& D, int& ncols, int nthreads = 0, bool verbose = 
   omp_set_num_threads(nthreads);
   
   if (verbose)
-    Rcpp::Rcout << " using " << nthreads << " openMP treads..." << std::endl;
+    Rcpp::Rcout << " using up to " << nthreads << " threads...";
 #endif
   
 #pragma omp parallel for
@@ -43,7 +43,7 @@ arma::mat calcNormS(const List& D, int& ncols, int nthreads = 0, bool verbose = 
   }
   
   if (verbose)
-    Rcpp::Rcout << " A and Ainv computation complete " << std::endl;
+    Rcpp::Rcout << " A, A inverse computation complete... ";
   
   // Force thread sync
   {
@@ -58,7 +58,7 @@ arma::mat calcNormS(const List& D, int& ncols, int nthreads = 0, bool verbose = 
   for ( arma::uword i = 0; i < N; i++ ) {
     for ( arma::uword j = i + 1; j < N; j++) {
       arma::mat tmp = A[i] * Ainv[j] + A[j] * Ainv[i]; 
-#pragma omp critical
+      #pragma omp critical
       {
         S = S + tmp;
       }

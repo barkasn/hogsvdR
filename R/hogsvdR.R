@@ -125,17 +125,21 @@ hogsvd.rsimple <- function(D, parallel, nthreads, verbose) {
     applyFn <- lapply;
   }
   
-  if (verbose) cat('Calculating B, Sigma and U matrices...');
+  if (verbose) cat('Calculating B matrices...');
   # Compute matrices B
   B <- applyFn(D, function(x) {
     t( Vinv %*% t(x)  )
   })
+  if (verbose) cat('done\n');
 
+  if (verbose) cat('Calculating Sigma...');
   # Compute diagonal matrices Sigma
   Sigma <- applyFn(Nseq, function(i) {
     apply(B[[i]],2,function(x) sqrt(sum(x^2)))
   })
+  if (verbose) cat('done\n');
   
+  if (verbose) cat('Calculating U matrices...');
   # Calculate U, the column normalised version of B
   U <- applyFn(Nseq, function(i) {
     sweep(B[[i]],2,Sigma[[i]],FUN='/')

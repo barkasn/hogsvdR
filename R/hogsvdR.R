@@ -110,9 +110,11 @@ hogsvd.rsimple <- function(D, parallel, nthreads, verbose) {
   
   # The Lambda
   Lambda <- eigen.dec$values
-  
+
+  if (verbose) cat('Calculating V inverse...');
   V <- eigen.dec$vectors
   Vinv <- MASS::ginv(eigen.dec$vectors)
+  if (verbose) cat('done\n');
   
   if (parallel) {
     require('parallel');

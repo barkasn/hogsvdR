@@ -53,8 +53,8 @@ arma::mat calcNormS(const List& D, int& ncols, int nthreads = 0, bool verbose = 
   // Check for user interupt
   Rcpp::checkUserInterrupt();
   
+  /* Old style double loop that is bad for omp
   
-#pragma omp parallel for
   for ( arma::uword i = 0; i < N; i++ ) {
     for ( arma::uword j = i + 1; j < N; j++) {
       arma::mat tmp = A[i] * Ainv[j] + A[j] * Ainv[i]; 
@@ -64,6 +64,27 @@ arma::mat calcNormS(const List& D, int& ncols, int nthreads = 0, bool verbose = 
       }
     }
   }
+
+  */
+  
+  std::vector< std::pair<int,int> > pairs;
+  for (int i = 0; i < N; i++) 
+    for (int j = i + 1; j < N; j++)
+      pairs.push_back(std::pair<int,int>(i,j));
+  
+#pragma omp parallel for
+  for(int k = 0; k < N * (N+1) / 2; k++) {
+    std::pair<int,int> p = pairs[k];
+    int i = p.first;
+    int j = p.second;
+
+    arma::mat tmp = A[i] * Ainv[j] + A[j] * Ainv[i]; 
+#pragma omp critical
+    {
+      S = S + tmp;
+    }    
+  }
+
   
   // Force thread sync
   {

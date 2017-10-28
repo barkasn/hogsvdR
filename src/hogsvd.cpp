@@ -53,7 +53,7 @@ arma::mat calcNormS(const List& D, int& ncols, int nthreads = 0, bool verbose = 
   // Check for user interupt
   Rcpp::checkUserInterrupt();
   
-  /* Old style double loop that is bad for omp
+  
   
   for ( arma::uword i = 0; i < N; i++ ) {
     for ( arma::uword j = i + 1; j < N; j++) {
@@ -65,8 +65,13 @@ arma::mat calcNormS(const List& D, int& ncols, int nthreads = 0, bool verbose = 
     }
   }
 
-  */
   
+  
+  /*
+   * Following is  better loop layout for omp, but currently doesn't work
+   */
+  
+  /*
   std::vector< std::pair<int,int> > pairs;
   for (int i = 0; i < N; i++) 
     for (int j = i + 1; j < N; j++)
@@ -84,6 +89,7 @@ arma::mat calcNormS(const List& D, int& ncols, int nthreads = 0, bool verbose = 
       S = S + tmp;
     }    
   }
+   */
 
   
   // Force thread sync
